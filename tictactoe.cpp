@@ -3,14 +3,13 @@
 using namespace std;
 
 // function prototypes
-bool isLegalMove (char[] move, int & r, int & c, int[][] board);
-void updateBoard (int[][] & board);
-void displayBoard (int[][] board);
-int checkWin (int[][] board);
+bool isLegalMove (char move[2], int &r, int &c, int board[][3]);
+void displayBoard (int board[][3]);
+int checkWin (int board[][3], int curPlayer);
 
 // main loop
 int main () {
-
+  
   cout << "Welcome to tic-tac-toe!" << endl;
 
   int winsX = 0, winsO = 0, ties = 0;
@@ -18,42 +17,82 @@ int main () {
 
   // player 1 = X = 0
   // player 2 = O = 1
- // no token there = -1
+  // no token there = -1
 
   while (isPlaying) {
     // initialize and fill board
-    int[3][3] board;
+    int board[3][3];
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
         board[i][j] = -1;
       }
     }
-  int curPlayer = 0;
+    int curPlayer = 0;
 
     // enter a move
     cout << "Enter a move, e.g. a1." << endl;
-    char[2] move;
+    char move[2];
     cin.get(move, 2, '\n');
     cin.get();
     // parse move and check if move is legal
-    int r, c = 0, 0;
-while (!isLegalMove(move, r, c, board)) {
+    int r = 0, c = 0;
+    while (!isLegalMove(move, r, c, board)) {
       cout << "Enter a legal move, e.g. a1." << endl;
       cin.get(move, 2, '\n');
       cin.get();
     }
-
-
+    
     // update board
-
+    board[r][c] = curPlayer;
+    
     // display board
+    displayBoard(board);
 
     // check for win
+    int win = checkWin(board, curPlayer);
+    if (win >= 0) {
+      if (win == 0) {
+	if (curPlayer == 0) {
+	  cout << "Player X won!" << endl;
+	  winsX ++;
+	}
+	else {
+	  cout << "Player O won!" << endl;
+	  winsO ++;
+	}
+      }
+      else if (win == 1) {
+	cout << "There was a tie." << endl;
+	ties ++;
+      }
+
+      // display score
+      cout << "Current standings:" << endl;
+      cout << "X wins: " << winsX << " -- O wins: " << winsO << " -- Ties: " << ties << endl;
+
+      // play again?
+      cout << "Play again? (y/n)" << endl;
+      char again;
+      cin >> again;
+      if (again == 'n') {
+	isPlaying == false;
+      }
+      else {
+	curPlayer = 0;
+      }
+    }
+
+    // change player
+    curPlayer = (curPlayer + 1) % 2;
+    
+  }
+  
  return 0;
 }
 
 // other functions
-bool isLegalMove (char[] move, int & r, int & c, int[][] board) {
+// returns if the inputted move is legal
+bool isLegalMove (char move[2], int & r, int & c, int board[][3]) {
   char letter = move[0];
   char number = move[1];
 
@@ -76,6 +115,73 @@ bool isLegalMove (char[] move, int & r, int & c, int[][] board) {
     else { c = 2; }
   }
 
+  // check if board position is empty
+  if (board[r][c] != -1) {
+    return false;
+  }
+
   // otherwise return true
   return true;
+}
+
+// displaying the board
+void displayBoard (int board[][3]) {
+  cout << " 1 2 3" << endl;
+  char letter = 'a';
+  for (int i = 0; i < 3; i++) {
+    cout << (char)letter << " ";
+    for (int j = 0; j < 3; j++) {
+      if (board[i][j] == 0) {
+	cout << "X ";
+      }
+      else if (board[i][j] == 1) {
+	cout << "O ";
+      }
+      else { cout << "  "; }
+    }
+    cout << endl;
+    letter += 1;
+  }
+}
+
+// checking for wins
+// 0 = curPlayer won, 1 = tie, -1 = no win yet
+int checkWin (int board[][3], int curPlayer) {  
+  // rows
+  for (int i = 0; i < 3; i++) {
+    if ((board[i][0] == board[i][1]) && (board[i][1] == board[i][2]) && (board[i][2] == curPlayer)) {
+      return 0;
+    }
+  }
+
+  // columns
+  for (int i = 0; i < 3; i++) {
+    if ((board[0][i] == board[1][i]) && (board[1][i] == board[2][i]) && (board[2][i] == curPlayer)) {
+      return 0;
+    }
+  }
+
+  // diagonals
+  if ((board[0][0] == board[1][1]) && (board[1][1] == board[2][2]) && (board[2][2] == curPlayer)) {
+    return 0;
+  }
+  if ((board[2][0] == board[1][1]) && (board[1][1] == board[0][2]) && (board[0][2] == curPlayer)) {
+    return 0;
+  }
+
+  // tie
+  bool hasEmpty = false;
+  
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      if (board[i][j] == -1) {
+	hasEmpty = true;
+      }
+    }
+  }
+
+  if (!hasEmpty) { return 1; } // there is a tie if there are no more moves left to play
+
+  return -1;
+    
 }
