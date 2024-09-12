@@ -1,24 +1,25 @@
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
 // function prototypes
-bool isLegalMove (char move[2], int &r, int &c, int board[][3]);
+bool isLegalMove (char move[80], int &r, int &c, int board[][3]);
 void displayBoard (int board[][3]);
 int checkWin (int board[][3], int curPlayer);
 
 // main loop
 int main () {
-  
-  cout << "Welcome to tic-tac-toe!" << endl;
 
   int winsX = 0, winsO = 0, ties = 0;
   bool isPlaying = true;
-
+  bool won = false;
+  char move[80];
+  
   // player 1 = X = 0
   // player 2 = O = 1
   // no token there = -1
-
+    
   while (isPlaying) {
     // initialize and fill board
     int board[3][3];
@@ -28,71 +29,86 @@ int main () {
       }
     }
     int curPlayer = 0;
-
-    // enter a move
-    cout << "Enter a move, e.g. a1." << endl;
-    char move[2];
-    cin.get(move, 2, '\n');
-    cin.get();
-    // parse move and check if move is legal
-    int r = 0, c = 0;
-    while (!isLegalMove(move, r, c, board)) {
-      cout << "Enter a legal move, e.g. a1." << endl;
-      cin.get(move, 2, '\n');
-      cin.get();
-    }
+    won = false;
     
-    // update board
-    board[r][c] = curPlayer;
-    
-    // display board
+    cout << "Welcome to tic-tac-toe!" << endl;
+        
     displayBoard(board);
 
-    // check for win
-    int win = checkWin(board, curPlayer);
-    if (win >= 0) {
-      if (win == 0) {
-	if (curPlayer == 0) {
-	  cout << "Player X won!" << endl;
-	  winsX ++;
+    while (!won) {
+      // enter a move
+      if (curPlayer == 0) { cout << "Player X's turn!" << endl; }
+      else { cout << "Player O's turn!" << endl; }
+      cout << "Enter a move, e.g. a1." << endl;
+
+      cin.get(move, 80);
+      if (move[0] == '\0') { cout << "ERROR!!!!" << endl; }
+      cin.get();
+      
+      // parse move and check if move is legal
+      int r, c;
+      while (!isLegalMove(move, r, c, board)) {
+	cout << "move " << move << endl;
+	if (move[0] == '\0') { cout << "ERROR!!!!" << endl; }
+	cout << "Enter a legal move, e.g. a1." << endl;
+	cin.get(move, 80);
+	cin.get();
+      }
+
+      // update board
+      board[r][c] = curPlayer;
+    
+      // display board
+      displayBoard(board);
+
+      // check for win
+      int win = checkWin(board, curPlayer);
+      if (win >= 0) {
+	won = true;
+	if (win == 0) {
+	  if (curPlayer == 0) {
+	    cout << "Player X won!" << endl;
+	    winsX ++;
+	  }
+	  else {
+	    cout << "Player O won!" << endl;
+	    winsO ++;
+	  }
+	}
+	else if (win == 1) {
+	  cout << "There was a tie." << endl;
+	  ties ++;
+	}
+
+	// display score
+	cout << "Current standings:" << endl;
+	cout << "X wins: " << winsX << " -- O wins: " << winsO << " -- Ties: " << ties << endl;
+
+	// play again?
+	cout << "Play again? (y/n)" << endl;
+	char again[2];
+	cin.get(again, 2, '\n');
+	cin.get();
+	if (again[0] == 'n') {
+	  isPlaying = false;
 	}
 	else {
-	  cout << "Player O won!" << endl;
-	  winsO ++;
+	  curPlayer = 0;
+	  cout << "Starting a new game." << endl;
 	}
       }
-      else if (win == 1) {
-	cout << "There was a tie." << endl;
-	ties ++;
-      }
-
-      // display score
-      cout << "Current standings:" << endl;
-      cout << "X wins: " << winsX << " -- O wins: " << winsO << " -- Ties: " << ties << endl;
-
-      // play again?
-      cout << "Play again? (y/n)" << endl;
-      char again;
-      cin >> again;
-      if (again == 'n') {
-	isPlaying == false;
-      }
       else {
-	curPlayer = 0;
+	// change player
+	curPlayer = (curPlayer + 1) % 2;
       }
     }
-
-    // change player
-    curPlayer = (curPlayer + 1) % 2;
-    
   }
-  
- return 0;
+  return 0;
 }
 
 // other functions
 // returns if the inputted move is legal
-bool isLegalMove (char move[2], int & r, int & c, int board[][3]) {
+bool isLegalMove (char move[80], int & r, int & c, int board[][3]) {
   char letter = move[0];
   char number = move[1];
 
@@ -102,7 +118,8 @@ bool isLegalMove (char move[2], int & r, int & c, int board[][3]) {
   }
   else {
     if (letter == 'a') { r = 0; }
- else { r = 2; }
+    else if (letter == 'b') { r = 1; }
+    else { r = 2; }
   }
 
   // check number
@@ -126,7 +143,7 @@ bool isLegalMove (char move[2], int & r, int & c, int board[][3]) {
 
 // displaying the board
 void displayBoard (int board[][3]) {
-  cout << " 1 2 3" << endl;
+  cout << "  1 2 3" << endl;
   char letter = 'a';
   for (int i = 0; i < 3; i++) {
     cout << (char)letter << " ";
