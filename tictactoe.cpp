@@ -40,18 +40,19 @@ int main () {
       if (curPlayer == 0) { cout << "Player X's turn!" << endl; }
       else { cout << "Player O's turn!" << endl; }
       cout << "Enter a move, e.g. a1." << endl;
-
-      cin.ignore('\n');
-	
-      cin.get(move, 80, '\n');
+      
+      cin.get(move, 80);
       cin.get();
 
       // parse move and check if move is legal
       int r, c;
       while (!isLegalMove(move, r, c, board)) {
-	cin.clear();
+	if (move[0] == '\0' or move[0] == '\n') {
+	  cin.clear();
+	  cin.ignore();
+	}
 	cout << "Enter a legal move, e.g. a1." << endl;
-	cin.get(move, 80, '\n');
+	cin.get(move, 80);
 	cin.get();
       }
 
@@ -114,6 +115,7 @@ bool isLegalMove (char move[80], int & r, int & c, int board[][3]) {
 
   // check letter
   if (letter != 'a' && letter != 'b' && letter != 'c') {
+    cout << "Not a real square." << endl;
     return false;
   }
   else {
@@ -124,6 +126,7 @@ bool isLegalMove (char move[80], int & r, int & c, int board[][3]) {
 
   // check number
   if (number != '1' && number != '2' && number != '3') {
+    cout << "Not a real square." << endl;
     return false;
   }
   else {
@@ -134,6 +137,7 @@ bool isLegalMove (char move[80], int & r, int & c, int board[][3]) {
 
   // check if board position is empty
   if (board[r][c] != -1) {
+    cout << "That spot's taken." << endl;
     return false;
   }
 
