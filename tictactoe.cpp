@@ -41,20 +41,17 @@ int main () {
       else { cout << "Player O's turn!" << endl; }
       cout << "Enter a move, e.g. a1." << endl;
 
-      //cin.get(move, 80);
-      //cin.get();
-      cin >> move;
-      
-      if (move[0] == '\0') {
-	cout << "Not a valid input!" << endl;
-	cin >> move;
-      }
+      cin.ignore('\n');
+	
+      cin.get(move, 80, '\n');
+      cin.get();
+
       // parse move and check if move is legal
       int r, c;
       while (!isLegalMove(move, r, c, board)) {
-	cout << "move " << move << endl;
+	cin.clear();
 	cout << "Enter a legal move, e.g. a1." << endl;
-	cin.get(move, 80);
+	cin.get(move, 80, '\n');
 	cin.get();
       }
 
